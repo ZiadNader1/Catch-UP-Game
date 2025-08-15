@@ -226,6 +226,13 @@ function updateGame() {
   gameInterval = requestAnimationFrame(updateGame);
 }
 
+// ====== Basket Movement for Mobile ======
+document.addEventListener("touchmove", (e) => {
+  const touch = e.touches[0];
+  basketX = Math.min(Math.max(0, touch.clientX - 60), window.innerWidth - 120);
+  basketImage.style.left = basketX + "px";
+});
+
 // ====== End Game ======
 function endGame() {
   cancelAnimationFrame(gameInterval);
@@ -248,3 +255,4 @@ function endGame() {
 
 // السماح بالـ scroll للصفحة
 document.body.style.overflowY = "auto";
+
