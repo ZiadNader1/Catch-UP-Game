@@ -30,12 +30,13 @@ const optionsMenu = document.getElementById("options-menu");
 const scoresMenu = document.getElementById("scores-menu");
 const backToMenuFromOptions = document.getElementById("back-to-menu-from-options");
 const backToMenuFromScores = document.getElementById("back-to-menu-from-scores");
+const resetScoresBtn = document.getElementById("reset-scores");
 
 // ====== Game Elements ======
 const gameArea = document.getElementById("game-area");
 const basketImage = document.getElementById("basket-image");
 
-let basketX = window.innerWidth / 2 - 60; // منتصف الشاشة
+let basketX = window.innerWidth / 2 - 60; // نص الشاشة
 let speed = 15;
 let fallingObjects = [];
 let gameInterval;
@@ -81,29 +82,13 @@ document.getElementById("new-game").addEventListener("click", () => {
 document.getElementById("preview-score").addEventListener("click", () => {
   mainMenu.classList.add("hidden");
   scoresMenu.classList.remove("hidden");
+  updateScoresTable();
+});
 
-  const scores = JSON.parse(localStorage.getItem("fallingObjectScores")) || [];
-  const scoresTableBody = document.querySelector("#scores-table tbody");
-  const noGamesMsg = document.getElementById("no-games-msg");
-
-  scoresTableBody.innerHTML = "";
-
-  if (scores.length === 0) {
-    noGamesMsg.style.display = "block";
-    document.getElementById("scores-table").style.display = "none";
-  } else {
-    noGamesMsg.style.display = "none";
-    document.getElementById("scores-table").style.display = "table";
-    scores.forEach(scoreItem => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${scoreItem.player}</td>
-        <td>${scoreItem.score}</td>
-        <td>${scoreItem.time}</td>
-      `;
-      scoresTableBody.appendChild(row);
-    });
-  }
+// Reset Scores
+resetScoresBtn.addEventListener("click", () => {
+  localStorage.removeItem("fallingObjectScores");
+  updateScoresTable();
 });
 
 // Options Menu
@@ -149,13 +134,6 @@ document.addEventListener("mousemove", (e) => {
   basketImage.style.left = basketX + "px";
 });
 
-// Touch support for mobile
-document.addEventListener("touchmove", (e) => {
-  const touch = e.touches[0];
-  basketX = Math.min(Math.max(0, touch.clientX - 60), window.innerWidth - 120);
-  basketImage.style.left = basketX + "px";
-});
-
 // ====== Spawn Falling Objects ======
 function spawnObject() {
   const selectedObjects = Array.from(document.querySelectorAll(".fallen-objects-list input[type='checkbox']:checked"))
@@ -187,6 +165,32 @@ function updateScoreDisplay() {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
+// ====== Update Scores Table ======
+function updateScoresTable() {
+  const scores = JSON.parse(localStorage.getItem("fallingObjectScores")) || [];
+  const scoresTableBody = document.querySelector("#scores-table tbody");
+  const noGamesMsg = document.getElementById("no-games-msg");
+
+  scoresTableBody.innerHTML = "";
+
+  if (scores.length === 0) {
+    noGamesMsg.style.display = "block";
+    document.getElementById("scores-table").style.display = "none";
+  } else {
+    noGamesMsg.style.display = "none";
+    document.getElementById("scores-table").style.display = "table";
+    scores.forEach(scoreItem => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${scoreItem.player}</td>
+        <td>${scoreItem.score}</td>
+        <td>${scoreItem.time}</td>
+      `;
+      scoresTableBody.appendChild(row);
+    });
+  }
+}
+
 // ====== Update Game ======
 function updateGame() {
   timeSurvived += 1/60;
@@ -195,22 +199,15 @@ function updateGame() {
     const top = parseFloat(obj.style.top) || 0;
     obj.style.top = top + obj.speed + "px";
 
-    const objLeft = parseFloat(obj.style.left);
-    const objRight = objLeft + 60;
-    const objTop = top;
-    const objBottom = top + 60;
+    const objRect = obj.getBoundingClientRect();
+    const basketRect = basketImage.getBoundingClientRect();
 
-    const basketLeft = basketX;
-    const basketRight = basketX + 120;
-    const basketTop = parseFloat(basketImage.style.bottom);
-    const basketBottom = basketTop + 80;
-
-    // إذا الأوبجكتس وقع في الباسكت
+    // لو الاوبجكتس خبطت الباسكات
     if(
-      objBottom >= basketTop &&
-      objTop <= basketBottom &&
-      objLeft <= basketRight &&
-      objRight >= basketLeft
+      objRect.bottom >= basketRect.top &&
+      objRect.top <= basketRect.bottom &&
+      objRect.left <= basketRect.right &&
+      objRect.right >= basketRect.left
     ){
       score++;
       catchSound.currentTime = 0;
@@ -220,8 +217,8 @@ function updateGame() {
       fallingObjects.splice(index, 1);
     }
 
-    // إذا الأوبجكتس نزل تحت الشاشة
-    if(objTop > window.innerHeight){
+    // لو الاوبجكتس نزلت تحت الشاشة
+    if(objRect.top > window.innerHeight){
       endGame();
     }
   });
@@ -245,6 +242,9 @@ function endGame() {
   });
   localStorage.setItem("fallingObjectScores", JSON.stringify(scores));
 
-  
   alert(`Game Over! Score: ${score}, Time: ${timeSurvived.toFixed(1)}s`);
 }
+ 
+//عشان نعمل سكرول في الصفحة 
+document.body.style.overflowY = "auto";
+
