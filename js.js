@@ -30,13 +30,12 @@ const optionsMenu = document.getElementById("options-menu");
 const scoresMenu = document.getElementById("scores-menu");
 const backToMenuFromOptions = document.getElementById("back-to-menu-from-options");
 const backToMenuFromScores = document.getElementById("back-to-menu-from-scores");
-const resetScoresBtn = document.getElementById("reset-scores");
 
 // ====== Game Elements ======
 const gameArea = document.getElementById("game-area");
 const basketImage = document.getElementById("basket-image");
 
-let basketX = window.innerWidth / 2 - 60; // منتصف الشاشة
+let basketX = window.innerWidth / 2 - 60;
 let speed = 15;
 let fallingObjects = [];
 let gameInterval;
@@ -82,13 +81,29 @@ document.getElementById("new-game").addEventListener("click", () => {
 document.getElementById("preview-score").addEventListener("click", () => {
   mainMenu.classList.add("hidden");
   scoresMenu.classList.remove("hidden");
-  updateScoresTable();
-});
 
-// Reset Scores
-resetScoresBtn.addEventListener("click", () => {
-  localStorage.removeItem("fallingObjectScores");
-  updateScoresTable();
+  const scores = JSON.parse(localStorage.getItem("fallingObjectScores")) || [];
+  const scoresTableBody = document.querySelector("#scores-table tbody");
+  const noGamesMsg = document.getElementById("no-games-msg");
+
+  scoresTableBody.innerHTML = "";
+
+  if (scores.length === 0) {
+    noGamesMsg.style.display = "block";
+    document.getElementById("scores-table").style.display = "none";
+  } else {
+    noGamesMsg.style.display = "none";
+    document.getElementById("scores-table").style.display = "table";
+    scores.forEach(scoreItem => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${scoreItem.player}</td>
+        <td>${scoreItem.score}</td>
+        <td>${scoreItem.time}</td>
+      `;
+      scoresTableBody.appendChild(row);
+    });
+  }
 });
 
 // Options Menu
@@ -120,19 +135,30 @@ backToMenuFromScores.addEventListener("click", () => {
 });
 
 // ====== Basket Movement ======
+// Keyboard
 document.addEventListener("keydown", (e) => {
   if(e.key === "ArrowLeft" || e.key === "a") {
     basketX = Math.max(0, basketX - speed);
   } else if(e.key === "ArrowRight" || e.key === "d") {
-    basketX = Math.min(window.innerWidth - 120, basketX + speed);
+    basketX = Math.min(window.innerWidth - basketImage.offsetWidth, basketX + speed);
   }
   basketImage.style.left = basketX + "px";
 });
 
+// Mouse
 document.addEventListener("mousemove", (e) => {
-  basketX = Math.min(Math.max(0, e.clientX - 60), window.innerWidth - 120);
+  basketX = Math.min(Math.max(0, e.clientX - basketImage.offsetWidth / 2), window.innerWidth - basketImage.offsetWidth);
   basketImage.style.left = basketX + "px";
 });
+
+// Touch (Mobile)
+document.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  basketX = touch.clientX - basketImage.offsetWidth / 2;
+  basketX = Math.max(0, Math.min(basketX, window.innerWidth - basketImage.offsetWidth));
+  basketImage.style.left = basketX + "px";
+}, { passive: false });
 
 // ====== Spawn Falling Objects ======
 function spawnObject() {
@@ -165,32 +191,6 @@ function updateScoreDisplay() {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
-// ====== Update Scores Table ======
-function updateScoresTable() {
-  const scores = JSON.parse(localStorage.getItem("fallingObjectScores")) || [];
-  const scoresTableBody = document.querySelector("#scores-table tbody");
-  const noGamesMsg = document.getElementById("no-games-msg");
-
-  scoresTableBody.innerHTML = "";
-
-  if (scores.length === 0) {
-    noGamesMsg.style.display = "block";
-    document.getElementById("scores-table").style.display = "none";
-  } else {
-    noGamesMsg.style.display = "none";
-    document.getElementById("scores-table").style.display = "table";
-    scores.forEach(scoreItem => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${scoreItem.player}</td>
-        <td>${scoreItem.score}</td>
-        <td>${scoreItem.time}</td>
-      `;
-      scoresTableBody.appendChild(row);
-    });
-  }
-}
-
 // ====== Update Game ======
 function updateGame() {
   timeSurvived += 1/60;
@@ -202,7 +202,6 @@ function updateGame() {
     const objRect = obj.getBoundingClientRect();
     const basketRect = basketImage.getBoundingClientRect();
 
-    // إذا الأوبجكتس وقع في الباسكت
     if(
       objRect.bottom >= basketRect.top &&
       objRect.top <= basketRect.bottom &&
@@ -217,7 +216,6 @@ function updateGame() {
       fallingObjects.splice(index, 1);
     }
 
-    // إذا الأوبجكتس نزل تحت الشاشة
     if(objRect.top > window.innerHeight){
       endGame();
     }
@@ -225,13 +223,6 @@ function updateGame() {
 
   gameInterval = requestAnimationFrame(updateGame);
 }
-
-// ====== Basket Movement for Mobile ======
-document.addEventListener("touchmove", (e) => {
-  const touch = e.touches[0];
-  basketX = Math.min(Math.max(0, touch.clientX - 60), window.innerWidth - 120);
-  basketImage.style.left = basketX + "px";
-});
 
 // ====== End Game ======
 function endGame() {
@@ -251,8 +242,3 @@ function endGame() {
 
   alert(`Game Over! Score: ${score}, Time: ${timeSurvived.toFixed(1)}s`);
 }
- 
-
-// السماح بالـ scroll للصفحة
-document.body.style.overflowY = "auto";
-
