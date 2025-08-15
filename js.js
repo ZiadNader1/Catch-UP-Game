@@ -35,7 +35,7 @@ const backToMenuFromScores = document.getElementById("back-to-menu-from-scores")
 const gameArea = document.getElementById("game-area");
 const basketImage = document.getElementById("basket-image");
 
-let basketX = window.innerWidth / 2 - 60;
+let basketX = window.innerWidth / 2 - 60; // منتصف الشاشة
 let speed = 15;
 let fallingObjects = [];
 let gameInterval;
@@ -135,30 +135,26 @@ backToMenuFromScores.addEventListener("click", () => {
 });
 
 // ====== Basket Movement ======
-// Keyboard
 document.addEventListener("keydown", (e) => {
   if(e.key === "ArrowLeft" || e.key === "a") {
     basketX = Math.max(0, basketX - speed);
   } else if(e.key === "ArrowRight" || e.key === "d") {
-    basketX = Math.min(window.innerWidth - basketImage.offsetWidth, basketX + speed);
+    basketX = Math.min(window.innerWidth - 120, basketX + speed);
   }
   basketImage.style.left = basketX + "px";
 });
 
-// Mouse
 document.addEventListener("mousemove", (e) => {
-  basketX = Math.min(Math.max(0, e.clientX - basketImage.offsetWidth / 2), window.innerWidth - basketImage.offsetWidth);
+  basketX = Math.min(Math.max(0, e.clientX - 60), window.innerWidth - 120);
   basketImage.style.left = basketX + "px";
 });
 
-// Touch (Mobile)
+// Touch support for mobile
 document.addEventListener("touchmove", (e) => {
-  e.preventDefault();
   const touch = e.touches[0];
-  basketX = touch.clientX - basketImage.offsetWidth / 2;
-  basketX = Math.max(0, Math.min(basketX, window.innerWidth - basketImage.offsetWidth));
+  basketX = Math.min(Math.max(0, touch.clientX - 60), window.innerWidth - 120);
   basketImage.style.left = basketX + "px";
-}, { passive: false });
+});
 
 // ====== Spawn Falling Objects ======
 function spawnObject() {
@@ -199,14 +195,22 @@ function updateGame() {
     const top = parseFloat(obj.style.top) || 0;
     obj.style.top = top + obj.speed + "px";
 
-    const objRect = obj.getBoundingClientRect();
-    const basketRect = basketImage.getBoundingClientRect();
+    const objLeft = parseFloat(obj.style.left);
+    const objRight = objLeft + 60;
+    const objTop = top;
+    const objBottom = top + 60;
 
+    const basketLeft = basketX;
+    const basketRight = basketX + 120;
+    const basketTop = parseFloat(basketImage.style.bottom);
+    const basketBottom = basketTop + 80;
+
+    // إذا الأوبجكتس وقع في الباسكت
     if(
-      objRect.bottom >= basketRect.top &&
-      objRect.top <= basketRect.bottom &&
-      objRect.left <= basketRect.right &&
-      objRect.right >= basketRect.left
+      objBottom >= basketTop &&
+      objTop <= basketBottom &&
+      objLeft <= basketRight &&
+      objRight >= basketLeft
     ){
       score++;
       catchSound.currentTime = 0;
@@ -216,7 +220,8 @@ function updateGame() {
       fallingObjects.splice(index, 1);
     }
 
-    if(objRect.top > window.innerHeight){
+    // إذا الأوبجكتس نزل تحت الشاشة
+    if(objTop > window.innerHeight){
       endGame();
     }
   });
@@ -240,5 +245,6 @@ function endGame() {
   });
   localStorage.setItem("fallingObjectScores", JSON.stringify(scores));
 
+  
   alert(`Game Over! Score: ${score}, Time: ${timeSurvived.toFixed(1)}s`);
 }
