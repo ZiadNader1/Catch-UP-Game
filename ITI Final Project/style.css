@@ -1,0 +1,306 @@
+/* ===== Body & Background ===== */
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: #000; /* أسود قبل بدء اللعبة */
+}
+
+/* Background Video */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  z-index: -1;
+}
+
+/* ===== Menus ===== */
+.menu {
+  background: rgba(0, 0, 20, 0.4);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 25px rgba(0, 0, 50, 0.6);
+  text-align: center;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  z-index: 100;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Headings */
+.menu h1, .menu h2 {
+  background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+/* Buttons */
+button {
+  display: block;
+  width: 220px;
+  padding: 12px;
+  margin: 12px auto;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 140, 255, 0.3);
+  color: #e0f7ff;
+  cursor: pointer;
+  transition: 0.3s;
+  border: 1px solid rgba(0, 180, 255, 0.5);
+}
+
+button:hover {
+  background: rgba(0, 180, 255, 0.5);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 200, 255, 0.8);
+}
+
+/* Social Icons */
+.social-icons {
+  margin: 20px 0;
+}
+
+.social-icons a {
+  color: #00d2ff;
+  font-size: 30px;
+  margin: 0 10px;
+  transition: 0.3s;
+}
+
+.social-icons a:hover {
+  color: white;
+  transform: scale(1.2);
+}
+
+/* Glow animation */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px rgba(0, 180, 255, 0.5),
+                 0 0 10px rgba(0, 180, 255, 0.4),
+                 0 0 20px rgba(0, 180, 255, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(0, 200, 255, 0.9),
+                 0 0 20px rgba(0, 200, 255, 0.8),
+                 0 0 40px rgba(0, 200, 255, 0.7);
+  }
+}
+
+/* Options Menu Glassmorphism */
+#options-menu {
+  background: rgba(0, 0, 30, 0.4);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 25px rgba(0, 0, 50, 0.6);
+  text-align: center;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  color: #e0f7ff;
+  max-width: 600px;
+  margin: 50px auto;
+}
+
+#options-menu h2 {
+  font-size: 2em;
+  background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s ease-in-out infinite alternate;
+  margin-bottom: 20px;
+}
+
+/* Volume slider */
+#volume {
+  width: 80%;
+  margin: 15px 0;
+}
+
+/* Difficulty and number inputs */
+#difficulty, #fallen-objects {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,180,255,0.5);
+  background: rgba(0,0,20,0.3);
+  color: #e0f7ff;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+/* Back Buttons */
+#back-to-menu-from-options,
+#back-to-menu-from-scores {
+  display: inline-block;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 1px solid rgba(0,180,255,0.5);
+  background: rgba(0,140,255,0.3);
+  color: #e0f7ff;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 20px;
+}
+
+#back-to-menu-from-options:hover,
+#back-to-menu-from-scores:hover {
+  background: rgba(0,180,255,0.5);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0,200,255,0.8);
+}
+
+/* Fallen Objects List */
+.fallen-objects-list {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.fallen-objects-list label {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.fallen-objects-list input[type="checkbox"] {
+  display: none; 
+}
+
+.fallen-objects-list img {
+  width: 70px;
+  border-radius: 10px;
+  border: 2px solid rgba(0,180,255,0.3);
+  transition: 0.3s;
+}
+
+.fallen-objects-list img:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(0,200,255,0.9), 0 0 25px rgba(0,200,255,0.6);
+}
+
+.fallen-objects-list input[type="checkbox"]:checked + img {
+  border-color: #00d2ff;
+  box-shadow: 0 0 10px #00d2ff, 0 0 20px rgba(0,200,255,0.6);
+}
+
+/* Scores Table */
+#scores-table {
+  width: 80%;
+  margin: 0 auto 20px auto;
+  border-collapse: collapse;
+  color: #e0f7ff;
+}
+
+#scores-table th, #scores-table td {
+  border: 1px solid rgba(0,180,255,0.5);
+  padding: 10px;
+  text-align: center;
+}
+
+#scores-table th {
+  background: rgba(0,0,20,0.5);
+  font-weight: bold;
+}
+
+#scores-table td {
+  background: rgba(0,0,20,0.3);
+}
+
+/* ===== Game Area ===== */
+#game-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 10;
+  background-size: cover;
+}
+
+/* Basket */
+#basket-image {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 80px;
+  background-size: cover;
+  z-index: 20;
+}
+
+/* Falling Objects */
+.falling-object {
+  position: absolute;
+  top: -80px;
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  pointer-events: none;
+  background-size: cover;
+  z-index: 15;
+}
+
+#no-games-msg {
+    color: aqua;
+    font-size: 1.5em;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 180, 255, 0.5), 0 0 20px rgba(0, 180, 255, 0.3);
+
+    
+}
+#credits-menu p {
+    color: #e0f7ff;
+    font-size: 1.2em;
+    margin: 10px 0;
+    text-align: center;
+    text-shadow: 0 0 5px rgba(0, 180, 255, 0.5), 0 0 10px rgba(0, 180, 255, 0.3);
+}
+/* Responsive */
+@media screen and (max-width: 500px) {
+  .fallen-objects-list img {
+    width: 50px;
+  }
+  #options-menu {
+    padding: 20px;
+  }
+  #back-to-menu-from-options,
+  #back-to-menu-from-scores {
+    width: 80%;
+  }
+  #basket-image {
+    width: 80px;
+    height: 60px;
+  }
+  .falling-object {
+    width: 50px;
+    height: 50px;
+  }
+}
+
